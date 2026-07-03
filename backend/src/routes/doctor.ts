@@ -152,7 +152,7 @@ router.get('/patsients/history', (req: Request | any, res: Response): void => {
   const history = Array.from(patientIds).map(pid => {
     const user = db.users.find(u => u.id === pid);
     const payments = db.receipts.filter(r => r.patsientId === pid); // simplified
-    const prescriptions = db.receipts.filter(r => r.patsientId === pid && r.doctorId === doctorId);
+    const prescriptions = db.prescriptions.filter(p => p.patsientId === pid && p.doctorId === doctorId);
     
     return {
       id: pid,

@@ -107,17 +107,18 @@ router.put('/appointments/:id', (req: Request | any, res: Response): void => {
 
 // Dashboard Stats
 router.get('/payments/stats', (req: Request | any, res: Response) => {
-  const receipts = db.receipts.filter(r => r.paid);
+  const receipts = db.receipts;
   
   const byMethod: { [key: string]: number } = {
     "Cash": 0,
-    "Card": 0
+    "Card": 0,
+    "Unpaid": 0
   };
 
   receipts.forEach(r => {
-    const method = r.method || "Cash";
+    const method = r.paid ? (r.method || "Cash") : "Unpaid";
     if (!byMethod[method]) byMethod[method] = 0;
-    byMethod[method] += parseFloat(r.amount);
+    byMethod[method] += parseFloat(r.amount || "0");
   });
 
   // Last 7 days

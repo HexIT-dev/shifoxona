@@ -3,6 +3,44 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Sidebar from './components/Sidebar';
 
+// Global Alert Component
+const GlobalAlert = () => {
+  const [alertState, setAlertState] = useState<{message: string, visible: boolean}>({message: '', visible: false});
+
+  useEffect(() => {
+    const originalAlert = window.alert;
+    window.alert = (message: string) => {
+      setAlertState({ message, visible: true });
+    };
+    return () => {
+      window.alert = originalAlert;
+    };
+  }, []);
+
+  if (!alertState.visible) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+      <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+        <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-blue-600 text-white">
+          <h2 className="text-xl font-bold">Xabarnoma</h2>
+        </div>
+        <div className="p-8">
+          <p className="text-slate-700 font-medium text-center">{alertState.message}</p>
+        </div>
+        <div className="p-4 bg-slate-50 flex justify-center">
+          <button 
+            onClick={() => setAlertState({ message: '', visible: false })}
+            className="px-8 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all active:scale-95"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Auth Pages
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
@@ -72,6 +110,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 function App() {
   return (
     <AuthProvider>
+      <GlobalAlert />
       <BrowserRouter>
         <Routes>
           {/* Public Auth Routes */}

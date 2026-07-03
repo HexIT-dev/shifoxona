@@ -8,6 +8,12 @@ export const isTimeValid = (date: Date): { valid: boolean; message?: string } =>
   if (isNaN(date.getTime())) {
     return { valid: false, message: 'Invalid date provided.' };
   }
+
+  // Check if date/time is in the past
+  if (date.getTime() < Date.now()) {
+    return { valid: false, message: 'Vaqt o\'tib ketgan. Iltimos kelajakdagi vaqtni tanlang.' };
+  }
+
   const hours = date.getHours();
   const minutes = date.getMinutes();
 
