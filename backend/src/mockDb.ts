@@ -76,7 +76,7 @@ const initDb = async () => {
   const adminPassword = await bcrypt.hash('admin123', 10);
   db.users.push({
     id: 1,
-    name: 'admin123',
+    name: 'admin',
     email: 'admin@hospital.com',
     password: adminPassword,
     role: 'ADMIN',
@@ -85,7 +85,7 @@ const initDb = async () => {
   const doctorPassword = await bcrypt.hash('doctor123', 10);
   db.users.push({
     id: db.getNextUserId(),
-    name: 'Dr. John Doe',
+    name: 'doctor',
     email: 'doctor@hospital.com',
     password: doctorPassword,
     role: 'DOCTOR',
@@ -96,11 +96,27 @@ const initDb = async () => {
   const cashierPassword = await bcrypt.hash('cashier123', 10);
   db.users.push({
     id: db.getNextUserId(),
-    name: 'Jane Cashier',
+    name: 'cashier',
     email: 'cashier@hospital.com',
     password: cashierPassword,
     role: 'CASHIER',
     phone: '444555666'
+  });
+
+  const patientPassword = await bcrypt.hash('user123', 10);
+  db.users.push({
+    id: db.getNextUserId(),
+    name: 'user',
+    email: 'user@hospital.com',
+    password: patientPassword,
+    role: 'PATSIENT',
+    phone: '777888999',
+    address: 'Tashkent',
+    patsientProfile: {
+      passed_examination_or_not: false,
+      cancellationCount: 0,
+      isBlocked: false
+    }
   });
 };
 
