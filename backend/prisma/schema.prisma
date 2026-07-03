@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  password      String
+  role          Role     @default(USER)
+  name          String
+  phone         String?
+  address       String?
+  image         String?
+  createdById   Int?
+  createdBy     User?    @relation("UserCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdUsers  User[]   @relation("UserCreator")
+  notifications Notification[]
+  
+  doctorProfile Doctor?
+  patsientProfile Patsient?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  DOCTOR
+  CASHIER
+  PATSIENT
+  USER
+}
+
+model Doctor {
+  id           Int           @id @default(autoincrement())
+  specialty    String
+  userId       Int           @unique
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+  prescriptions Prescription[]
+
+  @@map("doctors")
+}
+
+model Patsient {
+  id           Int           @id @default(autoincrement())
+  userId       Int           @unique
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+  prescriptions Prescription[]
+  payments     Payment[]
+
+  @@map("patsients")
+}
+
+model Appointment {
+  id          Int      @id @default(autoincrement())
+  date        DateTime
+  reason      String?
+  status      AppointmentStatus @default(SCHEDULED)
+  doctorId    Int
+  doctor      Doctor   @relation(fields: [doctorId], references: [id])
+  patsientId   Int
+  patsient     Patsient  @relation(fields: [patsientId], references: [id])
+  payments    Payment[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("appointments")
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+model Prescription {
+  id          Int      @id @default(autoincrement())
+  medicine    String
+  dosage      String
+  timing      String?
+  notes       String?
+  doctorId    Int
+  doctor      Doctor   @relation(fields: [doctorId], references: [id])
+  patsientId   Int
+  patsient     Patsient  @relation(fields: [patsientId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("prescriptions")
+}
+
+model Payment {
+  id            Int      @id @default(autoincrement())
+  amount        Float
+  method        String
+  status        PaymentStatus @default(PENDING)
+  patsientId     Int
+  patsient       Patsient  @relation(fields: [patsientId], references: [id])
+  appointmentId Int?
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("payments")
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  message   String
+  isRead    Boolean  @default(false)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@map("notifications")
+}
